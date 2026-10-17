@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Pembelajaran Interaktif - Perangkat Lunak (Informatika Kelas 7)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Fredoka & Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti CDN untuk Efek Kemenangan -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        heading: ['Fredoka', 'sans-serif'],
+                        body: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            blue: '#3B82F6',
+                            purple: '#8B5CF6',
+                            pink: '#EC4899',
+                            yellow: '#F59E0B',
+                            green: '#10B981',
+                            dark: '#1E293B'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            min-height: 100vh;
+        }
+        h1, h2, h3, h4, .font-fun {
+            font-family: 'Fredoka', cursive;
+        }
+        /* Style custom untuk animasi card & tombol */
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-8px) scale(1.02);
+        }
+        /* Custom scrollbar untuk kenyamanan anak-anak */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #E2E8F0;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3B82F6;
+            border-radius: 10px;
+        }
+        /* Animation Pulse Smooth */
+        @keyframes bounce-slow {
+            0%, 100% { transform: translateY(-5%); }
+            50% { transform: translateY(5%); }
+        }
+        .animate-bounce-slow {
+            animation: bounce-slow 3s infinite ease-in-out;
+        }
+        /* Drag and Drop styling */
+        .draggable {
+            cursor: grab;
+            user-select: none;
+            touch-action: none;
+        }
+        .draggable:active {
+            cursor: grabbing;
+        }
+        .dropzone.drag-over {
+            border-color: #3B82F6;
+            background-color: #EFF6FF;
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased flex flex-col min-h-screen">
+
+    <!-- Navbar Navigation -->
+    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md shadow-md border-b-4 border-blue-400">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Logo & Title -->
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('home')">
+                    <div class="bg-gradient-to-tr from-blue-500 to-indigo-600 text-white p-3 rounded-2xl shadow-lg transform -rotate-3 hover:rotate-0 transition-transform">
+                        <i class="fa-solid fa-laptop-code text-2xl sm:text-3xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-bold text-blue-600 leading-none">InformatikaFun</h1>
+                        <span class="text-xs sm:text-sm font-semibold text-slate-500">Perangkat Lunak - Kelas 7 SMP</span>
+                    </div>
+                </div>
+
+                <!-- Desktop Navigation Menu -->
+                <nav class="hidden md:flex space-x-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
+                    <button onclick="switchTab('home')" id="nav-home" class="nav-btn active flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-base transition-all duration-200">
+                        <i class="fa-solid fa-house"></i> Home
+                    </button>
+                    <button onclick="switchTab('tujuan')" id="nav-tujuan" class="nav-btn flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-base transition-all duration-200">
+                        <i class="fa-solid fa-bullseye"></i> Tujuan
+                    </button>
+                    <button onclick="switchTab('materi')" id="nav-materi" class="nav-btn flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-base transition-all duration-200">
+                        <i class="fa-solid fa-book-open"></i> Materi
+                    </button>
+                    <button onclick="switchTab('kuis')" id="nav-kuis" class="nav-btn flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-base transition-all duration-200">
+                        <i class="fa-solid fa-brain"></i> Kuis
+                    </button>
+                    <button onclick="switchTab('dragdrop')" id="nav-dragdrop" class="nav-btn flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-base transition-all duration-200">
+                        <i class="fa-solid fa-puzzle-piece"></i> Game Drag & Drop
+                    </button>
+                    <button onclick="switchTab('tentang')" id="nav-tentang" class="nav-btn flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-base transition-all duration-200">
+                        <i class="fa-solid fa-user-gear"></i> Tentang
+                    </button>
+                </nav>
+
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="md:hidden text-2xl text-slate-700 hover:text-blue-600 focus:outline-none p-2">
+                    <i class="fa-solid fa-bars" id="menu-icon"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Menu Dropdown -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-b-2 border-slate-200 px-4 pt-2 pb-4 space-y-2">
+            <button onclick="switchTab('home'); toggleMobileMenu()" class="mobile-nav-btn w-full text-left flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-lg text-slate-700 hover:bg-blue-50 hover:text-blue-600">
+                <i class="fa-solid fa-house w-6 text-center"></i> Home
+            </button>
+            <button onclick="switchTab('tujuan'); toggleMobileMenu()" class="mobile-nav-btn w-full text-left flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-lg text-slate-700 hover:bg-blue-50 hover:text-blue-600">
+                <i class="fa-solid fa-bullseye w-6 text-center"></i> Tujuan Pembelajaran
+            </button>
+            <button onclick="switchTab('materi'); toggleMobileMenu()" class="mobile-nav-btn w-full text-left flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-lg text-slate-700 hover:bg-blue-50 hover:text-blue-600">
+                <i class="fa-solid fa-book-open w-6 text-center"></i> Materi
+            </button>
+            <button onclick="switchTab('kuis'); toggleMobileMenu()" class="mobile-nav-btn w-full text-left flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-lg text-slate-700 hover:bg-blue-50 hover:text-blue-600">
+                <i class="fa-solid fa-brain w-6 text-center"></i> Kuis Interaktif
+            </button>
+            <button onclick="switchTab('dragdrop'); toggleMobileMenu()" class="mobile-nav-btn w-full text-left flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-lg text-slate-700 hover:bg-blue-50 hover:text-blue-600">
+                <i class="fa-solid fa-puzzle-piece w-6 text-center"></i> Drag & Drop Game
+            </button>
+            <button onclick="switchTab('tentang'); toggleMobileMenu()" class="mobile-nav-btn w-full text-left flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-lg text-slate-700 hover:bg-blue-50 hover:text-blue-600">
+                <i class="fa-solid fa-user-gear w-6 text-center"></i> Tentang Pengembang
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- SECTION 1: HOME -->
+        <section id="section-home" class="tab-content transition-opacity duration-300">
+            <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-3xl p-8 sm:p-12 text-white shadow-2xl relative overflow-hidden mb-10">
+                <!-- Background decorative shapes -->
+                <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+                <div class="absolute right-1/3 -top-10 w-48 h-48 bg-yellow-300/20 rounded-full blur-xl pointer-events-none"></div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center relative z-10">
+                    <div class="space-y-6 text-center md:text-left">
+                        <span class="inline-block bg-yellow-400 text-slate-900 font-extrabold px-4 py-1.5 rounded-full text-sm uppercase tracking-wider shadow-md">
+                            🚀 Kelas 7 SMP - Fase D
+                        </span>
+                        <h1 class="text-3xl sm:text-5xl font-black leading-tight">
+                            Jelajahi Dunia <span class="text-yellow-300 underline decoration-wavy decoration-yellow-400">Perangkat Lunak</span> Komputer!
+                        </h1>
+                        <p class="text-lg sm:text-xl text-blue-100 font-medium">
+                            Tahukah kamu bagaimana komputer bisa digunakan untuk mengetik, bermain game, dan menggambar? Semua itu karena bantuan <strong>Perangkat Lunak (Software)</strong>! Yuk belajar dengan cara yang seru dan interaktif!
+                        </p>
+                        <div class="flex flex-wrap gap-4 justify-center md:justify-start pt-2">
+                            <button onclick="switchTab('materi')" class="bg-yellow-400 hover:bg-yellow-300 text-slate-900 font-extrabold px-8 py-4 rounded-2xl shadow-lg hover:shadow-yellow-400/50 transform hover:-translate-y-1 transition text-lg flex items-center gap-3">
+                                <i class="fa-solid fa-play"></i> Mulai Belajar Now!
+                            </button>
+                            <button onclick="switchTab('dragdrop')" class="bg-white/20 hover:bg-white/30 text-white font-bold px-6 py-4 rounded-2xl border-2 border-white/40 backdrop-blur-sm transform hover:-translate-y-1 transition text-lg flex items-center gap-2">
+                                <i class="fa-solid fa-gamepad"></i> Main Game
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex justify-center items-center">
+                        <div class="relative w-64 h-64 sm:w-80 sm:h-80 bg-white/10 rounded-full flex items-center justify-center border-4 border-white/20 shadow-2xl animate-bounce-slow">
+                            <i class="fa-solid fa-laptop-code text-9xl text-yellow-300 drop-shadow-lg"></i>
+                            <div class="absolute -top-2 -left-2 bg-pink-500 text-white p-4 rounded-2xl shadow-lg font-bold flex items-center gap-2">
+                                <i class="fa-solid fa-compact-disc text-2xl"></i> Software
+                            </div>
+                            <div class="absolute -bottom-2 -right-2 bg-green-500 text-white p-4 rounded-2xl shadow-lg font-bold flex items-center gap-2">
+                                <i class="fa-solid fa-gear text-2xl animate-spin"></i> Sistem
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Access Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div onclick="switchTab('tujuan')" class="card-hover cursor-pointer bg-white p-6 rounded-3xl shadow-lg border-2 border-blue-100 flex flex-col items-center text-center group">
+                    <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-3xl mb-4 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-bullseye"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">Tujuan Belajar</h3>
+                    <p class="text-slate-600 text-sm">Cek capaian pembelajaran yang akan kamu kuasai!</p>
+                </div>
+
+                <div onclick="switchTab('materi')" class="card-hover cursor-pointer bg-white p-6 rounded-3xl shadow-lg border-2 border-purple-100 flex flex-col items-center text-center group">
+                    <div class="w-16 h-16 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center text-3xl mb-4 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-book-open"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">Modul Materi</h3>
+                    <p class="text-slate-600 text-sm">Pelajari konsep OS, Aplikasi, dan Perkakas secara detail.</p>
+                </div>
+
+                <div onclick="switchTab('kuis')" class="card-hover cursor-pointer bg-white p-6 rounded-3xl shadow-lg border-2 border-amber-100 flex flex-col items-center text-center group">
+                    <div class="w-16 h-16 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center text-3xl mb-4 group-hover:bg-amber-600 group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-brain"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">Kuis Interaktif</h3>
+                    <p class="text-slate-600 text-sm">Uji pemahamanmu lewat kuis pilihan ganda yang seru!</p>
+                </div>
+
+                <div onclick="switchTab('dragdrop')" class="card-hover cursor-pointer bg-white p-6 rounded-3xl shadow-lg border-2 border-emerald-100 flex flex-col items-center text-center group">
+                    <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-3xl mb-4 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-puzzle-piece"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">Game Drag & Drop</h3>
+                    <p class="text-slate-600 text-sm">Kelompokkan aplikasi sesuai kategorinya secara tepat!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: TUJUAN PEMBELAJARAN -->
+        <section id="section-tujuan" class="tab-content hidden transition-opacity duration-300">
+            <div class="bg-white rounded-3xl p-8 sm:p-10 shadow-xl border-2 border-blue-100 mb-8">
+                <div class="flex items-center gap-4 mb-6 border-b-2 border-slate-100 pb-4">
+                    <div class="p-4 bg-blue-500 text-white rounded-2xl text-3xl shadow-md">
+                        <i class="fa-solid fa-bullseye"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl sm:text-3xl font-bold text-slate-800">Tujuan & Capaian Pembelajaran</h2>
+                        <p class="text-slate-500 font-semibold">Capaian Pembelajaran (CP) Informatika - Fase D (Kelas 7 SMP)</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Target Card 1 -->
+                    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-2xl border-2 border-blue-200 flex gap-4 items-start">
+                        <div class="bg-blue-600 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg shrink-0 shadow-md">1</div>
+                        <div>
+                            <h3 class="text-xl font-bold text-blue-900 mb-2">Memahami Pengertian Software</h3>
+                            <p class="text-slate-700 leading-relaxed font-medium">Siswa mampu menjelaskan definisi, fungsi, dan pentingnya perangkat lunak (software) dalam menjalankan sistem komputer.</p>
+                        </div>
+                    </div>
+
+                    <!-- Target Card 2 -->
+                    <div class="bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-2xl border-2 border-purple-200 flex gap-4 items-start">
+                        <div class="bg-purple-600 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg shrink-0 shadow-md">2</div>
+                        <div>
+                            <h3 class="text-xl font-bold text-purple-900 mb-2">Mengidentifikasi Sistem Operasi</h3>
+                            <p class="text-slate-700 leading-relaxed font-medium">Siswa mampu membedakan jenis-jenis Sistem Operasi (Operating System) seperti Windows, Linux, macOS, dan Android beserta fungsinya.</p>
+                        </div>
+                    </div>
+
+                    <!-- Target Card 3 -->
+                    <div class="bg-gradient-to-br from-amber-50 to-yellow-50 p-6 rounded-2xl border-2 border-amber-200 flex gap-4 items-start">
+                        <div class="bg-amber-600 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg shrink-0 shadow-md">3</div>
+                        <div>
+                            <h3 class="text-xl font-bold text-amber-900 mb-2">Mengkategorikan Perangkat Aplikasi</h3>
+                            <p class="text-slate-700 leading-relaxed font-medium">Siswa mampu mengelompokkan software aplikasi berdasarkan kegunaannya (Pengolah Kata, Pengolah Angka, Presentasi, & Peramban).</p>
+                        </div>
+                    </div>
+
+                    <!-- Target Card 4 -->
+                    <div class="bg-gradient-to-br from-emerald-50 to-teal-50 p-6 rounded-2xl border-2 border-emerald-200 flex gap-4 items-start">
+                        <div class="bg-emerald-600 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg shrink-0 shadow-md">4</div>
+                        <div>
+                            <h3 class="text-xl font-bold text-emerald-900 mb-2">Mengenal Program Utility / Perkakas</h3>
+                            <p class="text-slate-700 leading-relaxed font-medium">Siswa memahami peran perangkat lunak pendukung/utilitas seperti Antivirus, Pembersih File, dan Utility Kompresi.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 bg-blue-600 text-white p-6 rounded-2xl flex items-center justify-between flex-wrap gap-4">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-lightbulb text-3xl text-yellow-300"></i>
+                        <span class="text-lg font-semibold">Sudah siap mencapai semua tujuan pembelajaran di atas?</span>
+                    </div>
+                    <button onclick="switchTab('materi')" class="bg-yellow-400 text-slate-900 font-extrabold px-6 py-3 rounded-xl shadow-md hover:bg-yellow-300 transition">
+                        Lanjut ke Materi <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: MATERI PEMBELAJARAN -->
+        <section id="section-materi" class="tab-content hidden transition-opacity duration-300">
+            <!-- Header Materi -->
+            <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-xl border-2 border-purple-100 mb-8">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-3xl font-bold text-slate-800">Materi Perangkat Lunak (Software)</h2>
+                        <p class="text-slate-500 font-semibold mt-1">Pilih sub-topik materi di bawah untuk mempelajarinya lebih detail!</p>
+                    </div>
+                    <!-- Sub-materi Tabs -->
+                    <div class="flex flex-wrap gap-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200 w-full sm:w-auto">
+                        <button onclick="switchSubMateri('definisi')" id="subnav-definisi" class="submateri-btn active-sub font-bold px-4 py-2 rounded-xl text-sm transition">Definisi</button>
+                        <button onclick="switchSubMateri('os')" id="subnav-os" class="submateri-btn font-bold px-4 py-2 rounded-xl text-sm transition">Sistem Operasi</button>
+                        <button onclick="switchSubMateri('aplikasi')" id="subnav-aplikasi" class="submateri-btn font-bold px-4 py-2 rounded-xl text-sm transition">Aplikasi</button>
+                        <button onclick="switchSubMateri('utility')" id="subnav-utility" class="submateri-btn font-bold px-4 py-2 rounded-xl text-sm transition">Perkakas / Utilitas</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sub-Materi 1: Definisi -->
+            <div id="submateri-definisi" class="submateri-content bg-white p-8 rounded-3xl shadow-lg border-2 border-slate-100">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <span class="bg-blue-100 text-blue-700 font-bold px-3 py-1 rounded-full text-sm">Bagian 1</span>
+                        <h3 class="text-3xl font-bold text-slate-800 mt-2 mb-4">Apa itu Perangkat Lunak (Software)?</h3>
+                        <p class="text-slate-600 text-lg leading-relaxed mb-4">
+                            <strong>Perangkat Lunak (Software)</strong> adalah kumpulan instruksi, data, atau program yang digunakan untuk mengoperasikan komputer dan menjalankan tugas tertentu.
+                        </p>
+                        <p class="text-slate-600 text-lg leading-relaxed mb-4">
+                            Berbeda dengan <em>Hardware</em> (perangkat keras) yang bisa dipegang dan dilihat fisiknya seperti mouse atau keyboard, <strong>Software bersifat tidak berwujud fisik</strong> tetapi dapat dirasakan manfaatnya melalui layar monitor.
+                        </p>
+                        <div class="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r-xl">
+                            <p class="text-amber-800 font-semibold">
+                                💡 <strong>Analogi Mudah:</strong> Jika komputer adalah tubuh manusia (Hardware), maka Software adalah <em>jiwa atau pikiran</em> yang membuat tubuh tersebut bisa bergerak dan berpikir!
+                            </p>
+                        </div>
+                    </div>
+                    <div class="bg-gradient-to-br from-blue-500 to-indigo-600 p-8 rounded-3xl text-white text-center shadow-xl">
+                        <i class="fa-solid fa-code text-8xl text-yellow-300 mb-4"></i>
+                        <h4 class="text-2xl font-bold mb-2">Fungsi Utama Software</h4>
+                        <ul class="text-left space-y-3 text-blue-100 text-base font-medium">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check-circle text-yellow-300"></i> Mengatur dan mengendalikan perangkat keras.</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check-circle text-yellow-300"></i> Menjadi penghubung antara pengguna (Brainware) dan Hardware.</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check-circle text-yellow-300"></i> Memproses perintah data input menjadi informasi output.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sub-Materi 2: Sistem Operasi -->
+            <div id="submateri-os" class="submateri-content hidden bg-white p-8 rounded-3xl shadow-lg border-2 border-slate-100">
+                <span class="bg-purple-100 text-purple-700 font-bold px-3 py-1 rounded-full text-sm">Bagian 2</span>
+                <h3 class="text-3xl font-bold text-slate-800 mt-2 mb-4">Sistem Operasi (Operating System / OS)</h3>
+                <p class="text-slate-600 text-lg leading-relaxed mb-6">
+                    <strong>Sistem Operasi (OS)</strong> adalah software paling utama dan penting yang bertugas mengelola seluruh sumber daya komputer serta menjembatani komunikasi antara pengguna dengan aplikasi lain. Tanpa OS, komputer tidak akan bisa dinyalakan!
+                </p>
+
+                <h4 class="text-xl font-bold text-slate-800 mb-4">Contoh-Contoh Sistem Operasi Populer:</h4>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Windows -->
+                    <div class="bg-blue-50 border-2 border-blue-200 p-6 rounded-2xl text-center hover:shadow-lg transition">
+                        <i class="fa-brands fa-windows text-5xl text-blue-600 mb-3"></i>
+                        <h5 class="text-xl font-bold text-slate-800">Windows</h5>
+                        <p class="text-sm text-slate-600 mt-2">Dibuat oleh Microsoft. Sangat populer digunakan pada PC dan laptop sekolah atau kantor.</p>
+                    </div>
+                    <!-- Linux -->
+                    <div class="bg-amber-50 border-2 border-amber-200 p-6 rounded-2xl text-center hover:shadow-lg transition">
+                        <i class="fa-brands fa-linux text-5xl text-amber-600 mb-3"></i>
+                        <h5 class="text-xl font-bold text-slate-800">Linux</h5>
+                        <p class="text-sm text-slate-600 mt-2">Sistem operasi *Open Source* (gratis dan bebas dimodifikasi). Sangat aman dari virus.</p>
+                    </div>
+                    <!-- macOS -->
+                    <div class="bg-slate-100 border-2 border-slate-300 p-6 rounded-2xl text-center hover:shadow-lg transition">
+                        <i class="fa-brands fa-apple text-5xl text-slate-800 mb-3"></i>
+                        <h5 class="text-xl font-bold text-slate-800">macOS</h5>
+                        <p class="text-sm text-slate-600 mt-2">Sistem operasi buatan Apple khusus untuk komputer Mac dan Macbook.</p>
+                    </div>
+                    <!-- Android -->
+                    <div class="bg-emerald-50 border-2 border-emerald-200 p-6 rounded-2xl text-center hover:shadow-lg transition">
+                        <i class="fa-brands fa-android text-5xl text-emerald-600 mb-3"></i>
+                        <h5 class="text-xl font-bold text-slate-800">Android</h5>
+                        <p class="text-sm text-slate-600 mt-2">Sistem operasi berbasis Linux khusus untuk perangkat smartphone dan tablet.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sub-Materi 3: Aplikasi -->
+            <div id="submateri-aplikasi" class="submateri-content hidden bg-white p-8 rounded-3xl shadow-lg border-2 border-slate-100">
+                <span class="bg-amber-100 text-amber-700 font-bold px-3 py-1 rounded-full text-sm">Bagian 3</span>
+                <h3 class="text-3xl font-bold text-slate-800 mt-2 mb-4">Perangkat Lunak Aplikasi (Application Software)</h3>
+                <p class="text-slate-600 text-lg leading-relaxed mb-6">
+                    <strong>Software Aplikasi</strong> adalah program yang dirancang khusus untuk membantu pengguna menyelesaikan tugas-tugas tertentu, seperti mengetik dokumen, menghitung data, atau menjelajahi internet.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="p-5 border-2 border-blue-200 bg-blue-50/50 rounded-2xl flex gap-4 items-start">
+                        <div class="p-3 bg-blue-500 text-white rounded-xl text-2xl"><i class="fa-solid fa-file-word"></i></div>
+                        <div>
+                            <h5 class="text-lg font-bold text-blue-900">1. Pengolah Kata (Word Processor)</h5>
+                            <p class="text-slate-600 text-sm mt-1">Digunakan untuk membuat surat, laporan, dan dokumen teks.</p>
+                            <span class="inline-block mt-2 text-xs font-bold bg-blue-200 text-blue-800 px-2 py-1 rounded">Contoh: MS Word, Google Docs, LibreOffice Writer</span>
+                        </div>
+                    </div>
+
+                    <div class="p-5 border-2 border-green-200 bg-green-50/50 rounded-2xl flex gap-4 items-start">
+                        <div class="p-3 bg-green-500 text-white rounded-xl text-2xl"><i class="fa-solid fa-file-excel"></i></div>
+                        <div>
+                            <h5 class="text-lg font-bold text-green-900">2. Pengolah Angka (Spreadsheet)</h5>
+                            <p class="text-slate-600 text-sm mt-1">Digunakan untuk mengolah data tabel, angka, serta grafik perhitungan.</p>
+                            <span class="inline-block mt-2 text-xs font-bold bg-green-200 text-green-800 px-2 py-1 rounded">Contoh: MS Excel, Google Sheets</span>
+                        </div>
+                    </div>
+
+                    <div class="p-5 border-2 border-amber-200 bg-amber-50/50 rounded-2xl flex gap-4 items-start">
+                        <div class="p-3 bg-amber-500 text-white rounded-xl text-2xl"><i class="fa-solid fa-file-powerpoint"></i></div>
+                        <div>
+                            <h5 class="text-lg font-bold text-amber-900">3. Pembuat Presentasi</h5>
+                            <p class="text-slate-600 text-sm mt-1">Digunakan untuk merancang slide presentasi yang menarik visualnya.</p>
+                            <span class="inline-block mt-2 text-xs font-bold bg-amber-200 text-amber-800 px-2 py-1 rounded">Contoh: MS PowerPoint, Canva, Google Slides</span>
+                        </div>
+                    </div>
+
+                    <div class="p-5 border-2 border-purple-200 bg-purple-50/50 rounded-2xl flex gap-4 items-start">
+                        <div class="p-3 bg-purple-500 text-white rounded-xl text-2xl"><i class="fa-solid fa-globe"></i></div>
+                        <div>
+                            <h5 class="text-lg font-bold text-purple-900">4. Peramban Web (Web Browser)</h5>
+                            <p class="text-slate-600 text-sm mt-1">Digunakan untuk mengakses dan berselancar di dunia internet.</p>
+                            <span class="inline-block mt-2 text-xs font-bold bg-purple-200 text-purple-800 px-2 py-1 rounded">Contoh: Google Chrome, Mozilla Firefox, Edge</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sub-Materi 4: Utility -->
+            <div id="submateri-utility" class="submateri-content hidden bg-white p-8 rounded-3xl shadow-lg border-2 border-slate-100">
+                <span class="bg-emerald-100 text-emerald-700 font-bold px-3 py-1 rounded-full text-sm">Bagian 4</span>
+                <h3 class="text-3xl font-bold text-slate-800 mt-2 mb-4">Perangkat Lunak Perkakas (Utility Software)</h3>
+                <p class="text-slate-600 text-lg leading-relaxed mb-6">
+                    <strong>Utility Software</strong> adalah program pendukung yang berfungsi untuk merawat, mengoptimalkan, dan mengamankan sistem komputer agar tetap berjalan lancar dan aman dari gangguan.
+                </p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    <div class="bg-red-50 p-6 rounded-2xl border-2 border-red-200 text-center">
+                        <i class="fa-solid fa-shield-halved text-5xl text-red-500 mb-3"></i>
+                        <h5 class="text-xl font-bold text-slate-800">Antivirus</h5>
+                        <p class="text-sm text-slate-600 mt-2">Melindungi komputer dari serangan virus, malware, dan spyware berbahaya.</p>
+                        <p class="text-xs font-bold text-red-600 mt-2">Contoh: Avast, Windows Defender, Smadav</p>
+                    </div>
+
+                    <div class="bg-blue-50 p-6 rounded-2xl border-2 border-blue-200 text-center">
+                        <i class="fa-solid fa-file-zipper text-5xl text-blue-500 mb-3"></i>
+                        <h5 class="text-xl font-bold text-slate-800">File Archiver / Kompresi</h5>
+                        <p class="text-sm text-slate-600 mt-2">Mengecilkan ukuran file agar mudah dikirim melalui internet.</p>
+                        <p class="text-xs font-bold text-blue-600 mt-2">Contoh: WinRAR, 7-Zip</p>
+                    </div>
+
+                    <div class="bg-green-50 p-6 rounded-2xl border-2 border-green-200 text-center">
+                        <i class="fa-solid fa-broom text-5xl text-green-500 mb-3"></i>
+                        <h5 class="text-xl font-bold text-slate-800">Pembersih Disk (Cleaner)</h5>
+                        <p class="text-sm text-slate-600 mt-2">Membersihkan sampah sistem (junk files) agar memori komputer lega kembali.</p>
+                        <p class="text-xs font-bold text-green-600 mt-2">Contoh: CCleaner</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: KUIS INTERAKTIF -->
+        <section id="section-kuis" class="tab-content hidden transition-opacity duration-300">
+            <div class="max-w-3xl mx-auto bg-white rounded-3xl p-6 sm:p-10 shadow-xl border-2 border-amber-100">
+
+                <!-- Kuis Header -->
+                <div class="flex items-center justify-between border-b-2 border-slate-100 pb-4 mb-6">
+                    <div>
+                        <h2 class="text-2xl sm:text-3xl font-bold text-slate-800">Kuis Interaktif Software</h2>
+                        <p class="text-slate-500 text-sm sm:text-base">Jawab soal-soal berikut untuk menguji pemahamanmu!</p>
+                    </div>
+                    <div class="bg-amber-100 text-amber-800 font-extrabold px-4 py-2 rounded-2xl text-lg flex items-center gap-2">
+                        <i class="fa-solid fa-trophy text-yellow-500"></i>
+                        <span id="quiz-score-display">Skor: 0</span>
+                    </div>
+                </div>
+
+                <!-- Quiz Progress Bar -->
+                <div class="w-full bg-slate-100 h-4 rounded-full mb-8 overflow-hidden">
+                    <div id="quiz-progress-bar" class="bg-amber-500 h-full w-1/5 transition-all duration-300"></div>
+                </div>
+
+                <!-- Quiz Question Container -->
+                <div id="quiz-container">
+                    <div class="mb-6">
+                        <span id="question-number" class="text-sm font-bold bg-blue-100 text-blue-700 px-3 py-1 rounded-full">Soal 1 dari 5</span>
+                        <h3 id="question-text" class="text-xl sm:text-2xl font-bold text-slate-800 mt-3">
+                            Loading pertanyaan...
+                        </h3>
+                    </div>
+
+                    <!-- Options -->
+                    <div id="options-container" class="space-y-4 mb-8">
+                        <!-- Transformed via JS -->
+                    </div>
+
+                    <!-- Feedback Box -->
+                    <div id="feedback-box" class="hidden p-4 rounded-2xl font-bold mb-6 flex items-center gap-3">
+                        <i id="feedback-icon" class="text-2xl"></i>
+                        <span id="feedback-text"></span>
+                    </div>
+
+                    <!-- Next Button -->
+                    <div class="flex justify-end">
+                        <button id="next-question-btn" onclick="nextQuestion()" class="hidden bg-blue-600 hover:bg-blue-700 text-white font-extrabold px-8 py-3.5 rounded-2xl shadow-lg transition flex items-center gap-2 text-lg">
+                            Soal Berikutnya <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quiz Result Screen (Hidden by default) -->
+                <div id="quiz-result" class="hidden text-center py-8">
+                    <div class="w-24 h-24 bg-yellow-100 text-yellow-500 rounded-full flex items-center justify-center text-5xl mx-auto mb-4 animate-bounce">
+                        <i class="fa-solid fa-award"></i>
+                    </div>
+                    <h3 class="text-3xl font-bold text-slate-800 mb-2">Selesai Kuis!</h3>
+                    <p class="text-slate-600 text-lg mb-6">Kamu telah menyelesaikan semua soal kuis dengan baik.</p>
+                    
+                    <div class="bg-blue-50 border-2 border-blue-200 p-6 rounded-2xl max-w-sm mx-auto mb-8">
+                        <span class="text-slate-500 font-bold block text-sm">SKOR AKHIR KAMU:</span>
+                        <span id="final-score" class="text-5xl font-black text-blue-600">100</span>
+                    </div>
+
+                    <button onclick="restartQuiz()" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-extrabold px-8 py-4 rounded-2xl shadow-lg transition text-lg inline-flex items-center gap-2">
+                        <i class="fa-solid fa-rotate-right"></i> Coba Kuis Lagi
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SECTION 5: DRAG AND DROP GAME -->
+        <section id="section-dragdrop" class="tab-content hidden transition-opacity duration-300">
+            <div class="bg-white rounded-3xl p-6 sm:p-10 shadow-xl border-2 border-emerald-100">
+                
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 border-b-2 border-slate-100 pb-4">
+                    <div>
+                        <h2 class="text-2xl sm:text-3xl font-bold text-slate-800">Game Drag & Drop Software</h2>
+                        <p class="text-slate-500 text-sm sm:text-base">Tarik (drag) item software di bawah dan taruh (drop) ke dalam kategori wadah yang sesuai!</p>
+                    </div>
+                    <button onclick="resetDragDropGame()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-4 py-2 rounded-xl transition flex items-center gap-2 text-sm">
+                        <i class="fa-solid fa-rotate-left"></i> Reset Game
+                    </button>
+                </div>
+
+                <!-- Draggable Items Pool -->
+                <div class="mb-8 bg-slate-50 p-6 rounded-2xl border-2 border-dashed border-slate-300">
+                    <h3 class="text-sm font-extrabold text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-hand-pointer text-blue-500"></i> Pilihan Item Software (Tarik dari sini):
+                    </h3>
+                    <div id="draggable-items-container" class="flex flex-wrap gap-4 min-h-[60px] items-center">
+                        <!-- Draggable Items Rendered Here -->
+                    </div>
+                </div>
+
+                <!-- Drop Targets Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Dropzone 1: Sistem Operasi -->
+                    <div class="dropzone border-2 border-purple-200 bg-purple-50/40 p-5 rounded-2xl transition-all min-h-[220px] flex flex-col" data-category="os">
+                        <div class="flex items-center gap-2 text-purple-800 font-bold text-lg mb-3 pb-2 border-b border-purple-200 pointer-events-none">
+                            <i class="fa-solid fa-gears text-2xl"></i> Sistem Operasi
+                        </div>
+                        <div class="dropped-items-container flex-grow flex flex-col gap-2 pointer-events-none">
+                            <!-- Dropped items go here -->
+                        </div>
+                    </div>
+
+                    <!-- Dropzone 2: Aplikasi -->
+                    <div class="dropzone border-2 border-blue-200 bg-blue-50/40 p-5 rounded-2xl transition-all min-h-[220px] flex flex-col" data-category="aplikasi">
+                        <div class="flex items-center gap-2 text-blue-800 font-bold text-lg mb-3 pb-2 border-b border-blue-200 pointer-events-none">
+                            <i class="fa-solid fa-shapes text-2xl"></i> Software Aplikasi
+                        </div>
+                        <div class="dropped-items-container flex-grow flex flex-col gap-2 pointer-events-none">
+                            <!-- Dropped items go here -->
+                        </div>
+                    </div>
+
+                    <!-- Dropzone 3: Utility -->
+                    <div class="dropzone border-2 border-emerald-200 bg-emerald-50/40 p-5 rounded-2xl transition-all min-h-[220px] flex flex-col" data-category="utility">
+                        <div class="flex items-center gap-2 text-emerald-800 font-bold text-lg mb-3 pb-2 border-b border-emerald-200 pointer-events-none">
+                            <i class="fa-solid fa-wrench text-2xl"></i> Program Utility
+                        </div>
+                        <div class="dropped-items-container flex-grow flex flex-col gap-2 pointer-events-none">
+                            <!-- Dropped items go here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Game Status Message -->
+                <div id="dragdrop-success-msg" class="hidden mt-8 bg-emerald-500 text-white p-6 rounded-2xl text-center shadow-lg animate-bounce">
+                    <h3 class="text-2xl font-black mb-1"><i class="fa-solid fa-circle-check"></i> Luar Biasa! Semuanya Benar!</h3>
+                    <p class="font-medium">Kamu berhasil mengelompokkan seluruh perangkat lunak sesuai dengan fungsinya.</p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SECTION 6: TENTANG PENGEMBANG -->
+        <section id="section-tentang" class="tab-content hidden transition-opacity duration-300">
+            <div class="max-w-4xl mx-auto bg-white rounded-3xl p-8 sm:p-12 shadow-xl border-2 border-slate-100">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+                    
+                    <!-- Profile Avatar Card -->
+                    <div class="flex flex-col items-center text-center">
+                        <div class="w-44 h-44 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-full p-2 shadow-2xl mb-4">
+                            <div class="w-full h-full bg-white rounded-full flex items-center justify-center overflow-hidden">
+                                <i class="fa-solid fa-user-graduate text-7xl text-blue-600"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-800">Zivarevie Hetzibah Suhandi</h3>
+                        <p class="text-blue-600 font-semibold text-sm">Pengembang Media Pembelajaran</p>
+                    </div>
+
+                    <!-- Developer Information Details -->
+                    <div class="md:col-span-2 space-y-4 border-l-0 md:border-l-2 border-slate-100 pl-0 md:pl-8">
+                        <h2 class="text-3xl font-bold text-slate-800 mb-2">Tentang Media Pembelajaran</h2>
+                        <p class="text-slate-600 leading-relaxed font-medium">
+                            Media pembelajaran interaktif ini dirancang khusus untuk mendukung proses belajar mengajar mata pelajaran <strong>Informatika Kurikulum Merdeka</strong> pada tingkat SMP/MTs (Fase D - Kelas 7).
+                        </p>
+                        
+                        <div class="space-y-3 pt-2">
+                            <div class="flex items-center gap-3 text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                                <i class="fa-solid fa-book text-blue-500 text-xl w-8 text-center"></i>
+                                <div>
+                                    <span class="text-xs font-bold text-slate-400 block uppercase">Mata Pelajaran</span>
+                                    <span class="font-bold text-slate-800">Informatika - Perangkat Lunak (Software)</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-3 text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                                <i class="fa-solid fa-users text-purple-500 text-xl w-8 text-center"></i>
+                                <div>
+                                    <span class="text-xs font-bold text-slate-400 block uppercase">Target Sasaran</span>
+                                    <span class="font-bold text-slate-800">Siswa SMP Kelas 7 (Fase D)</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-3 text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                                <i class="fa-solid fa-code-branch text-emerald-500 text-xl w-8 text-center"></i>
+                                <div>
+                                    <span class="text-xs font-bold text-slate-400 block uppercase">Teknologi Web</span>
+                                    <span class="font-bold text-slate-800">HTML5, Tailwind CSS, JavaScript SPA</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 flex gap-4">
+                            <span class="inline-flex items-center gap-2 bg-blue-100 text-blue-800 px-4 py-2 rounded-xl text-sm font-bold">
+                                <i class="fa-solid fa-check-circle"></i> Interactive UI
+                            </span>
+                            <span class="inline-flex items-center gap-2 bg-green-100 text-green-800 px-4 py-2 rounded-xl text-sm font-bold">
+                                <i class="fa-solid fa-mobile-screen"></i> Responsive Design
+                            </span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-6 mt-12">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-slate-600 font-semibold text-sm sm:text-base">
+                &copy; 2026 Media Pembelajaran Informatika Interaktif — Didevelop oleh <strong>Zivarevie Hetzibah Suhandi</strong>
+            </p>
+            <p class="text-slate-400 text-xs mt-1">Dirancang untuk Siswa SMP Kelas 7 (Fase D) • Kurikulum Merdeka</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        /* ==========================================
+           1. SISTEM NAVIGASI TAB (SPA)
+           ========================================== */
+        function switchTab(tabId) {
+            // Hide all section tabs
+            document.querySelectorAll('.tab-content').forEach(section => {
+                section.classList.add('hidden');
+            });
+
+            // Show target section tab
+            const targetSection = document.getElementById('section-' + tabId);
+            if (targetSection) {
+                targetSection.classList.remove('hidden');
+            }
+
+            // Update Desktop Nav style
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
+                btn.classList.add('text-slate-600', 'hover:bg-slate-200');
+            });
+
+            const activeBtn = document.getElementById('nav-' + tabId);
+            if (activeBtn) {
+                activeBtn.classList.remove('text-slate-600', 'hover:bg-slate-200');
+                activeBtn.classList.add('bg-blue-600', 'text-white', 'shadow-md');
+            }
+
+            // Scroll Smooth to Top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        /* ==========================================
+           2. SUB-MATERI TABS
+           ========================================== */
+        function switchSubMateri(subId) {
+            // Hide all sub-materi contents
+            document.querySelectorAll('.submateri-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+
+            // Show selected content
+            document.getElementById('submateri-' + subId).classList.remove('hidden');
+
+            // Reset subnav button styles
+            document.querySelectorAll('.submateri-btn').forEach(btn => {
+                btn.classList.remove('bg-purple-600', 'text-white', 'shadow-md');
+                btn.classList.add('bg-white', 'text-slate-600', 'hover:bg-slate-200');
+            });
+
+            // Activate current subnav button
+            const activeSubBtn = document.getElementById('subnav-' + subId);
+            if (activeSubBtn) {
+                activeSubBtn.classList.remove('bg-white', 'text-slate-600', 'hover:bg-slate-200');
+                activeSubBtn.classList.add('bg-purple-600', 'text-white', 'shadow-md');
+            }
+        }
+
+        /* ==========================================
+           3. KUIS INTERAKTIF LOGIC
+           ========================================== */
+        const quizData = [
+            {
+                question: "Manakah di bawah ini yang merupakan definisi paling tepat dari Perangkat Lunak (Software)?",
+                options: [
+                    "Komponen fisik komputer yang bisa disentuh tangan",
+                    "Kumpulan instruksi atau program yang menjalankan fungsi komputer",
+                    "Kabel dan daya listrik penyokong komputer",
+                    "Layar monitor untuk menampilkan gambar"
+                ],
+                correct: 1
+            },
+            {
+                question: "Contoh Sistem Operasi (OS) yang umum digunakan pada smartphone adalah...",
+                options: [
+                    "Microsoft Word",
+                    "Android",
+                    "Google Chrome",
+                    "Avast Antivirus"
+                ],
+                correct: 1
+            },
+            {
+                question: "Software yang berfungsi mengolah kata untuk membuat surat atau laporan adalah...",
+                options: [
+                    "Microsoft Excel",
+                    "Microsoft PowerPoint",
+                    "Microsoft Word",
+                    "WinRAR"
+                ],
+                correct: 2
+            },
+            {
+                question: "Antivirus dan program pembersih sampah disk termasuk ke dalam jenis software...",
+                options: [
+                    "Sistem Operasi",
+                    "Perangkat Lunak Aplikasi",
+                    "Perangkat Lunak Perkakas (Utility)",
+                    "Perangkat Keras (Hardware)"
+                ],
+                correct: 2
+            },
+            {
+                question: "Aplikasi Google Chrome dan Mozilla Firefox digunakan untuk...",
+                options: [
+                    "Menjelajahi halaman web di Internet",
+                    "Mengecilkan ukuran berkas file",
+                    "Mengedit video professional",
+                    "Membersihkan virus di komputer"
+                ],
+                correct: 0
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answerSelected = false;
+
+        function loadQuestion() {
+            answerSelected = false;
+            const q = quizData[currentQuestionIndex];
+
+            // Update Progress Bar & Question Info
+            document.getElementById('question-number').innerText = `Soal ${currentQuestionIndex + 1} dari ${quizData.length}`;
+            document.getElementById('question-text').innerText = q.question;
+            document.getElementById('quiz-progress-bar').style.width = `${((currentQuestionIndex + 1) / quizData.length) * 100}%`;
+
+            // Reset Feedback & Next Button
+            const feedbackBox = document.getElementById('feedback-box');
+            feedbackBox.classList.add('hidden');
+            document.getElementById('next-question-btn').classList.add('hidden');
+
+            // Render Options
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left p-4 rounded-2xl border-2 border-slate-200 hover:border-blue-400 hover:bg-blue-50 font-semibold text-slate-700 transition flex items-center justify-between group';
+                btn.onclick = () => selectAnswer(idx, btn);
+                btn.innerHTML = `
+                    <span class="flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-xl bg-slate-100 group-hover:bg-blue-500 group-hover:text-white flex items-center justify-center font-bold text-sm">${String.fromCharCode(65 + idx)}</span>
+                        <span>${opt}</span>
+                    </span>
+                    <i class="fa-regular fa-circle text-slate-300 group-hover:text-blue-500 text-xl"></i>
+                `;
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function selectAnswer(selectedIndex, selectedBtn) {
+            if (answerSelected) return; // Prevent multiple clicks
+            answerSelected = true;
+
+            const q = quizData[currentQuestionIndex];
+            const feedbackBox = document.getElementById('feedback-box');
+            const feedbackIcon = document.getElementById('feedback-icon');
+            const feedbackText = document.getElementById('feedback-text');
+            const optionsContainer = document.getElementById('options-container');
+            const optionButtons = optionsContainer.children;
+
+            if (selectedIndex === q.correct) {
+                // Correct Answer
+                score += 20;
+                document.getElementById('quiz-score-display').innerText = `Skor: ${score}`;
+                
+                selectedBtn.classList.remove('border-slate-200', 'hover:border-blue-400');
+                selectedBtn.classList.add('border-green-500', 'bg-green-50', 'text-green-800');
+                
+                feedbackBox.className = "p-4 rounded-2xl font-bold mb-6 flex items-center gap-3 bg-green-100 text-green-800";
+                feedbackIcon.className = "fa-solid fa-circle-check text-2xl text-green-600";
+                feedbackText.innerText = "Hore! Jawaban kamu Benar sekali! 🎉";
+            } else {
+                // Wrong Answer
+                selectedBtn.classList.remove('border-slate-200', 'hover:border-blue-400');
+                selectedBtn.classList.add('border-red-500', 'bg-red-50', 'text-red-800');
+
+                // Highlight Correct Option
+                optionButtons[q.correct].classList.add('border-green-500', 'bg-green-50');
+
+                feedbackBox.className = "p-4 rounded-2xl font-bold mb-6 flex items-center gap-3 bg-red-100 text-red-800";
+                feedbackIcon.className = "fa-solid fa-circle-xmark text-2xl text-red-600";
+                feedbackText.innerText = `Ups! Jawabannya kurang tepat. Jawaban yang benar adalah yang berwarna hijau.`;
+            }
+
+            feedbackBox.classList.remove('hidden');
+            document.getElementById('next-question-btn').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizData.length) {
+                loadQuestion();
+            } else {
+                showQuizResult();
+            }
+        }
+
+        function showQuizResult() {
+            document.getElementById('quiz-container').classList.add('hidden');
+            document.getElementById('quiz-result').classList.remove('hidden');
+            document.getElementById('final-score').innerText = score;
+
+            // Trigger Confetti Effect for Good Scores
+            if (score >= 60 && typeof confetti === 'function') {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            }
+        }
+
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            document.getElementById('quiz-score-display').innerText = `Skor: 0`;
+            document.getElementById('quiz-result').classList.add('hidden');
+            document.getElementById('quiz-container').classList.remove('hidden');
+            loadQuestion();
+        }
+
+        /* ==========================================
+           4. GAME DRAG AND DROP LOGIC
+           ========================================== */
+        const dragItemsData = [
+            { id: 'item-1', name: 'Windows 11', category: 'os', icon: 'fa-brands fa-windows text-blue-500' },
+            { id: 'item-2', name: 'MS Word', category: 'aplikasi', icon: 'fa-solid fa-file-word text-blue-600' },
+            { id: 'item-3', name: 'Avast Antivirus', category: 'utility', icon: 'fa-solid fa-shield-halved text-orange-500' },
+            { id: 'item-4', name: 'Android', category: 'os', icon: 'fa-brands fa-android text-emerald-500' },
+            { id: 'item-5', name: 'Google Chrome', category: 'aplikasi', icon: 'fa-brands fa-chrome text-red-500' },
+            { id: 'item-6', name: 'WinRAR Compression', category: 'utility', icon: 'fa-solid fa-file-zipper text-purple-500' }
+        ];
+
+        function initDragDropGame() {
+            const container = document.getElementById('draggable-items-container');
+            container.innerHTML = '';
+            document.getElementById('dragdrop-success-msg').classList.add('hidden');
+
+            // Clear dropzones
+            document.querySelectorAll('.dropped-items-container').forEach(zone => {
+                zone.innerHTML = '';
+            });
+
+            // Shuffle array items
+            const shuffled = [...dragItemsData].sort(() => Math.random() - 0.5);
+
+            shuffled.forEach(item => {
+                const el = document.createElement('div');
+                el.id = item.id;
+                el.draggable = true;
+                el.setAttribute('data-category', item.category);
+                el.className = 'draggable bg-white border-2 border-slate-300 hover:border-blue-500 px-4 py-2.5 rounded-xl shadow-sm font-bold text-slate-700 flex items-center gap-2 transform active:scale-95 transition-all';
+                el.innerHTML = `<i class="${item.icon}"></i> <span>${item.name}</span>`;
+
+                // Add Drag Event Listeners
+                el.addEventListener('dragstart', handleDragStart);
+                container.appendChild(el);
+            });
+
+            setupDropzones();
+        }
+
+        let draggedItem = null;
+
+        function handleDragStart(e) {
+            draggedItem = this;
+            e.dataTransfer.setData('text/plain', this.id);
+        }
+
+        function setupDropzones() {
+            const dropzones = document.querySelectorAll('.dropzone');
+
+            dropzones.forEach(zone => {
+                zone.addEventListener('dragover', e => {
+                    e.preventDefault();
+                    zone.classList.add('drag-over');
+                });
+
+                zone.addEventListener('dragleave', () => {
+                    zone.classList.remove('drag-over');
+                });
+
+                zone.addEventListener('drop', e => {
+                    e.preventDefault();
+                    zone.classList.remove('drag-over');
+
+                    if (!draggedItem) return;
+
+                    const zoneCategory = zone.getAttribute('data-category');
+                    const itemCategory = draggedItem.getAttribute('data-category');
+
+                    // Check Match Category
+                    if (zoneCategory === itemCategory) {
+                        const targetContainer = zone.querySelector('.dropped-items-container');
+                        
+                        // Style for correctly placed item
+                        draggedItem.className = 'bg-green-100 border-2 border-green-400 px-3 py-2 rounded-xl font-bold text-green-900 flex items-center justify-between text-sm shadow-sm';
+                        draggedItem.draggable = false;
+                        draggedItem.innerHTML += ` <i class="fa-solid fa-circle-check text-green-600"></i>`;
+                        
+                        targetContainer.appendChild(draggedItem);
+                        draggedItem = null;
+
+                        checkGameCompletion();
+                    } else {
+                        // Animation for Wrong Drop
+                        draggedItem.classList.add('border-red-500', 'bg-red-50');
+                        setTimeout(() => {
+                            if (draggedItem) {
+                                draggedItem.classList.remove('border-red-500', 'bg-red-50');
+                            }
+                        }, 800);
+                    }
+                });
+            });
+        }
+
+        function checkGameCompletion() {
+            const pool = document.getElementById('draggable-items-container');
+            if (pool.children.length === 0) {
+                document.getElementById('dragdrop-success-msg').classList.remove('hidden');
+                if (typeof confetti === 'function') {
+                    confetti({
+                        particleCount: 120,
+                        spread: 80,
+                        origin: { y: 0.6 }
+                    });
+                }
+            }
+        }
+
+        function resetDragDropGame() {
+            initDragDropGame();
+        }
+
+        /* ==========================================
+           5. INITIALIZATION ON PAGE LOAD
+           ========================================== */
+        window.onload = function() {
+            // Activate Home Tab
+            switchTab('home');
+
+            // Load Quiz First Question
+            loadQuestion();
+
+            // Initialize Drag & Drop Game
+            initDragDropGame();
+        };
+    </script>
+</body>
+</html>
